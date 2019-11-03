@@ -1,0 +1,33 @@
+apply plugin: 'java-library'
+apply plugin: 'java'
+apply plugin: 'maven'
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven {
+   		url "http://192.168.6.109:58081/repository/sk2/"
+    }
+}
+
+ext {
+    if (!project.hasProperty('build_version')){
+        build_version = "local";
+    }
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src/main/java'
+		}
+	}
+}
+
+
+jar {
+    archiveName "custom-ap-${build_version}.jar"
+	from ('src/main/java') {
+		include 'META-INF/services/javax.annotation.processing.Processor'
+	}
+}
