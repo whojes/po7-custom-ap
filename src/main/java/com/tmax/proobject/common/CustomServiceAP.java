@@ -21,33 +21,13 @@ import javax.lang.model.element.TypeElement;
  */
 @SupportedAnnotationTypes({ "com.tmax.proobject.common.CkService" })
 public class CustomServiceAP extends AbstractProcessor {
-	private File configDir;
 	private File configFile;
 	private FileWriter fw;
 	private String configFileName = "servicegroup.xml.generated";
 
 	@Override
 	public synchronized void init(ProcessingEnvironment env) {
-		String buildDir = System.getProperty("build_dir");
-		String servicegroupName = System.getProperty("sg_name");
-
-		configDir = new File(buildDir, "servicegroup/" + servicegroupName + "/config");
-		if (!configDir.exists()) {
-			configDir.mkdir();
-		}
-
-		configFile = new File(configDir, configFileName);
-		try {
-			if (configFile.exists()) {
-				fw = new FileWriter(configFile, true);
-			} else {
-				fw = new FileWriter(configFile, true);
-				fw.write("\t<!-- generate -->\n");
-				fw.flush();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// shit
 	}
 
 	@Override
@@ -88,13 +68,18 @@ public class CustomServiceAP extends AbstractProcessor {
 				+ "\t\t<ns17:service-type>COMPLEX</ns17:service-type>\n" 
 			+ "\t</ns17:service-object>\n\n";
 
+			if (fw == null) {
+				String sgName = serviceClass.split(System.getProperty("app_name")+".")[1].split("\\.")[0];
+				String buildDir = System.getProperty("build_dir");
+				createFileWriter(sgName, buildDir);
+			}
+
 			try {
 				fw.write(serviceXml);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-
 		try {
 			fw.close();
 		} catch (IOException e) {
@@ -104,8 +89,30 @@ public class CustomServiceAP extends AbstractProcessor {
 		return true;
 	}
 
+
 	@Override
 	public SourceVersion getSupportedSourceVersion() {
 		return SourceVersion.latestSupported();
+	}
+	
+	private void createFileWriter(String sgName, String buildDir) {
+		File configDir = new File(buildDir, String.format("%s/%s/%s", "servicegroup", sgName, "config"));
+		if (!configDir.exists()) {
+			configDir.mkdir();
+		}
+
+		configFile = new File(configDir, configFileName);
+		try {
+			if (configFile.exists()) {
+				fw = new FileWriter(configFile, true);
+			} else {
+				fw = new FileWriter(configFile, true);
+				fw.write("\t<!-- generate -->\n");
+				fw.flush();
+			}
+		} catch (IOException e) {
+			// e.printStackTrace();
+			System.err.println("FileWriter Create Failed: " + configFileName);
+		}
 	}
 }
