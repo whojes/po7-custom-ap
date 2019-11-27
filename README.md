@@ -8,7 +8,7 @@
 
 #### 사용 방법
 
-1. servicegroup 의 build.gradle 내부 dependency 블록에 다음과 같은 두 줄을 추가한다. 
+1. application 혹은 servicegroup 의 build.gradle 내부 dependency 블록에 다음과 같은 두 줄을 추가한다. 
 ```gradle
 // 생략
 dependencies {
@@ -35,7 +35,6 @@ dependencies {
 
       <!-- INSERT HERE -->
     </ns17:service-group>
-
     ```
 
 3. CkServiceObject 를 상속하는 클래스에 다음과 같은 annotation 을 달아버린다.
@@ -47,4 +46,19 @@ import com.tmax.proobject.common.HttpMethod;
 public class HelloWorldCreate extends CkServiceObject<HelloWorldIn, HelloWorldOut> {
   // service 이름이 Hello-worldsCreate 일 경우
 }
+```
+
+4. Service Executor 클래스를 만들기 귀찮은 경우, 다음과 같은 annotation 을 추가해도 좋다.
+Executor 파일이 빌드 시 생성되어 jar 파일에 포함된 후 삭제되어 파일시스템에는 남지 않는다.
+```java
+import com.tmax.proobject.common.CkService;
+import com.tmax.proobject.common.CkServiceExecutor;
+import com.tmax.proobject.common.HttpMethod;
+
+@CkService(serviceName="hello-worlds", method=HttpMethod.POST)
+@CkServiceExecutor
+public class HelloWorldCreate extends CkServiceObject<HelloWorldIn, HelloWorldOut> {
+  // service 이름이 Hello-worldsCreate 일 경우
+}
+
 ```

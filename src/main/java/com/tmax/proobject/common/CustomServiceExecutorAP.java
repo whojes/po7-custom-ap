@@ -18,7 +18,9 @@ import javax.lang.model.element.TypeElement;
 
 @SupportedAnnotationTypes({ "com.tmax.proobject.common.CkServiceExecutor" })
 public class CustomServiceExecutorAP extends AbstractProcessor {
-    private final String marking = "//generated";
+    private final String marking = System.getProperty("generate_mark") != null ? System.getProperty("generate_mark")
+            : "//generated";
+    private final String timestamp = "\n//" + System.currentTimeMillis();
 
     @Override
     public synchronized void init(ProcessingEnvironment env) {
@@ -41,36 +43,44 @@ public class CustomServiceExecutorAP extends AbstractProcessor {
             servicePackage = classFullname.substring(0, classFullname.lastIndexOf("."));
             serviceClass = classFullname.substring(classFullname.lastIndexOf(".") + 1);
 
+            CkServiceExecutor cs = ae.getAnnotation(CkServiceExecutor.class);
+            ExecutorType et = cs.executorType();
+
             String sgName = servicePackage.split(System.getProperty("app_name") + ".")[1].split("\\.")[0];
             file = new File(System.getProperty("build_dir"), String.format("../../%s/src/main/java/%s/%sExecutor.java",
                     sgName, servicePackage.replaceAll("\\.", "/"), serviceClass));
 
             if (file.exists()) {
+                if (marking.equals(System.getProperty(file.toString()))) {
+                    file.delete();
+                    continue;
+                }
+                String firstLine = null;
                 BufferedReader br = null;
                 try {
                     br = new BufferedReader(new FileReader(file));
-                    String firstline = br.readLine();
+                    firstLine = br.readLine();
                     br.close();
-                    if (firstline.equals(marking)) {
-                        file.delete();
-                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                continue;
-            } else {
-                try {
-                    fw = new FileWriter(file, false);
-                    fw.write(getExecutorCode().replaceAll("packagename", servicePackage).replaceAll("classname",
-                            serviceClass));
-                    fw.flush();
-                    fw.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (marking.equals(firstLine)) {
+                    file.delete();
+                } else {
+                    continue;
                 }
             }
+            try {
+                fw = new FileWriter(file, false);
+                fw.write(getExecutorCode(et).replaceAll("packagename", servicePackage).replaceAll("classname",
+                        serviceClass));
+                fw.flush();
+                fw.close();
+                System.setProperty(file.toString(), marking);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-
         return false;
     }
 
@@ -79,13 +89,17 @@ public class CustomServiceExecutorAP extends AbstractProcessor {
         return SourceVersion.latestSupported();
     }
 
-    private String getExecutorCode() {
-        return marking + "\npackage packagename;\n"
-                + "import com.tmax.proobject.engine.service.executor.ServiceExecutor;\n"
-                + "public class classnameExecutor extends ServiceExecutor {\n"
-                + "public classnameExecutor() { this.serviceObject = new classname(); }\n" + "@Override\n"
-                + "public Object execute(Object arg0, String arg1) throws Throwable { return this.serviceObject.service(arg0); }\n"
-                + "}";
+    private String getExecutorCode(ExecutorType et) {
+        switch (et) {
+        case DEFAULT:
+            return marking + timestamp + "\npackage packagename;\n"
+                    + "import com.tmax.proobject.engine.service.executor.ServiceExecutor;\n"
+                    + "public class classnameExecutor extends ServiceExecutor {\n"
+                    + "public classnameExecutor() { this.serviceObject = new classname(); }\n" + "@Override\n"
+                    + "public Object execute(Object arg0, String arg1) throws Throwable { return this.serviceObject.service(arg0); }\n"
+                    + "}";
+        default:
+            return "";
+        }
     }
-
 }
