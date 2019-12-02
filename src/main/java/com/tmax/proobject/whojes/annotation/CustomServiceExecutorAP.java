@@ -1,4 +1,4 @@
-package com.tmax.proobject.common;
+package com.tmax.proobject.whojes.annotation;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,7 +16,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 
-@SupportedAnnotationTypes({ "com.tmax.proobject.common.CkServiceExecutor" })
+@SupportedAnnotationTypes({ "com.tmax.proobject.whojes.CkServiceExecutor" })
 public class CustomServiceExecutorAP extends AbstractProcessor {
     private final String marking = System.getProperty("generate_mark") != null ? System.getProperty("generate_mark")
             : "//generated";

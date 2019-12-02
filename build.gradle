@@ -5,12 +5,13 @@ apply plugin: 'maven'
 repositories {
     mavenCentral()
     jcenter()
-    maven {
-   		url "http://192.168.6.109:58081/repository/sk2/"
-    }
+	maven {
+		url "http://192.168.1.150:8081/repository/sk2/"
+	}
 }
 
 ext {
+	poVersion = "7.0.0.1.195"
     if (!project.hasProperty('build_version')){
         build_version = "local";
     }
@@ -27,7 +28,23 @@ sourceSets {
 
 jar {
     archiveName "custom-ap-${build_version}.jar"
-	from ('src/main/java') {
+	from ('src/main') {
 		include 'META-INF/services/javax.annotation.processing.Processor'
 	}
+}
+
+dependencies {
+	implementation "com.tmax:proobject:${poVersion}:core"
+	implementation "com.tmax:proobject:${poVersion}:dataobject"
+	implementation "com.tmax:proobject:${poVersion}:model"
+	implementation "com.tmax:proobject:${poVersion}:network"
+	implementation "com.tmax:proobject:${poVersion}:promapper"
+	implementation "com.tmax:proobject:${poVersion}:runtime"
+	implementation "com.tmax:proobject:${poVersion}:logger"
+	implementation "com.tmax:proobject:${poVersion}:scheduler"
+	implementation "com.tmax:proobject:${poVersion}:util"
+	implementation "com.tmax:proobject-util:2.0.2.120:icache-core"
+	implementation "com.google.code.gson:gson:2.8.0"
+	implementation "com.google.guava:guava:23.0"
+	implementation 'com.intellij:annotations:12.0'
 }

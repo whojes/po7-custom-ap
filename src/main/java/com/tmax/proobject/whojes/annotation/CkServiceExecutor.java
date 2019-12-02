@@ -1,4 +1,4 @@
-package com.tmax.proobject.common;
+package com.tmax.proobject.whojes.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
