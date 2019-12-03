@@ -81,7 +81,7 @@ public class CustomServiceExecutorAP extends AbstractProcessor {
                 e.printStackTrace();
             }
         }
-        return false;
+        return true;
     }
 
     @Override
