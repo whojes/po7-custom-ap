@@ -44,14 +44,29 @@ public class CustomServiceAP extends AbstractProcessor {
 			serviceClass = te.getQualifiedName().toString();
 
 			String[] temp = null;
-			try { // extends CkServiceObject (default)
-				temp = te.getSuperclass().toString().split("<")[1].split(">")[0].split(",");
-			} catch (NullPointerException|ArrayIndexOutOfBoundsException e) {
-				// implements ServiceObject (PO service object)
-				temp = te.getInterfaces().get(0).toString().split("<")[1].split(">")[0].split(",");
+			String superclassName;
+			if (te.getSuperclass().toString().indexOf("<") != -1) {
+				 // extends CkServiceObject (default)
+				superclassName = te.getSuperclass().toString();
+			} else {
+				try {
+					// implements ServiceObject 
+					superclassName = te.getInterfaces().get(0).toString();
+				} catch (IndexOutOfBoundsException e) {
+					// no implement or extend
+					continue;
+				}
 			}
-			inputClass = temp[0];
-			outputClass = temp[1];
+			int f = superclassName.indexOf("<");
+			int l = superclassName.lastIndexOf(">");
+			try {
+				temp = superclassName.substring(f + 1, l).split(",");
+			} catch(IndexOutOfBoundsException e) {
+				System.err.println("WARNING: Do not use with raw type of ServiceObject or CkServiceObject");
+			}
+
+			inputClass = temp[0].split("<")[0];
+			outputClass = temp[1].split("<")[0];
 
 			CkService cs = ae.getAnnotation(CkService.class);
 			String s = cs.serviceName();
