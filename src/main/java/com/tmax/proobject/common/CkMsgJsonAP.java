@@ -88,7 +88,8 @@ public class CkMsgJsonAP extends AbstractProcessor {
             packageName = elementUtils.getPackageOf(te).toString();
             className = te.getSimpleName().toString();
             fullName = te.getQualifiedName().toString();
-            sourceCode = String.format(sourceBeforeFormat, packageName, className + SUFFIX, StaticClasses.CK_GSON_MESSAGE, className);
+            CkMsgJson annotation = te.getAnnotation(CkMsgJson.class);
+            sourceCode = String.format(sourceBeforeFormat, packageName, className + SUFFIX, annotation.gson(), className);
         }
 
         public String getSourceCode() {

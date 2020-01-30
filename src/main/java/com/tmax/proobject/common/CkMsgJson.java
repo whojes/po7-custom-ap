@@ -8,4 +8,5 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.SOURCE)
 public @interface CkMsgJson {
+    String gson() default StaticClasses.CK_GSON_MESSAGE;
 }
